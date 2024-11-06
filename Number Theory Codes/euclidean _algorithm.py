@@ -19,3 +19,22 @@ a = int(input("Enter the first number: "))
 b = int(input("Enter the second number: "))
 
 show_solution(a, b)
+
+# -----------------------------------------------------------
+# OUTPUT : 
+
+# Enter the first number: 1124
+# Enter the second number: 238
+
+# Euclidean Algorithm:
+# 1124 = 238 * 4 + 172
+# 238 = 172 * 1 + 66
+# 172 = 66 * 2 + 40
+# 66 = 40 * 1 + 26
+# 40 = 26 * 1 + 14
+# 26 = 14 * 1 + 12
+# 14 = 12 * 1 + 2
+# 12 = 2 * 6 + 0
+
+# GCD of 1124 and 238 is: 2
+

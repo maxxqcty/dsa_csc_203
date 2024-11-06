@@ -96,7 +96,7 @@ def main_conversions():
     to_base = int(input("Convert To\n1. Binary\n2. Decimal\n3. Octal\n4. Hexadecimal\n\nEnter Choice: "))
     
     if from_base == 1:
-        binary_inp = input("\n\tEnter Binary: ")
+        binary_inp = input("\nEnter Binary: ")
         if to_base == 2:
             print(convert_to_decimal(binary_inp, 1))
         elif to_base == 3:
@@ -133,3 +133,25 @@ def main_conversions():
 
 if __name__ == "__main__":
     main_conversions()
+
+# -----------------------------------------------------------
+# OUTPUT :
+
+# Convert From:
+# 1. Binary
+# 2. Decimal
+# 3. Octal
+# 4. Hexadecimal
+
+# Enter Choice: 1
+# Convert To
+# 1. Binary
+# 2. Decimal
+# 3. Octal
+# 4. Hexadecimal
+
+# Enter Choice: 3
+
+# Enter Binary: 10111111.11011
+# Result: 277.66
+

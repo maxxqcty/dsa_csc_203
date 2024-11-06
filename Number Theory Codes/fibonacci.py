@@ -16,3 +16,28 @@ def fibonacci(n, memo={}):
 n = int(input("Enter a positive integer for n: "))
 result = fibonacci(n)
 print(f"fib({n}) =", result)
+
+# -----------------------------------------------------------
+# OUTPUT :
+
+# Enter a positive integer for n: 20
+# fib(3) = fib(2) + fib(1) = 2
+# fib(4) = fib(3) + fib(2) = 3
+# fib(5) = fib(4) + fib(3) = 5
+# fib(6) = fib(5) + fib(4) = 8
+# fib(7) = fib(6) + fib(5) = 13
+# fib(8) = fib(7) + fib(6) = 21
+# fib(9) = fib(8) + fib(7) = 34
+# fib(10) = fib(9) + fib(8) = 55
+# fib(11) = fib(10) + fib(9) = 89
+# fib(12) = fib(11) + fib(10) = 144
+# fib(13) = fib(12) + fib(11) = 233
+# fib(14) = fib(13) + fib(12) = 377
+# fib(15) = fib(14) + fib(13) = 610
+# fib(16) = fib(15) + fib(14) = 987
+# fib(17) = fib(16) + fib(15) = 1597
+# fib(18) = fib(17) + fib(16) = 2584
+# fib(19) = fib(18) + fib(17) = 4181
+# fib(20) = fib(19) + fib(18) = 6765
+# fib(20) = 6765
+

@@ -42,3 +42,18 @@ end_range = int(input("Enter the end of the range: "))
 prime_numbers = find_primes_in_range(start_range, end_range)
 print("\n Prime numbers:")
 display_matrix(prime_numbers)
+
+# -----------------------------------------------------------
+# OUTPUT :
+
+
+# Enter the start of the range: 1 
+# Enter the end of the range: 100
+
+#  Prime numbers:
+#   2   3   5   7  11
+#  13  17  19  23  29
+#  31  37  41  43  47
+#  53  59  61  67  71
+#  73  79  83  89  97
+

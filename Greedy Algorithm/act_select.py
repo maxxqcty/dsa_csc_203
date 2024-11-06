@@ -42,3 +42,61 @@ if __name__ == '__main__':
     
     # Function Call
     activitySelection(activities)
+
+# -----------------------------------------------------------
+# OUTPUT : 
+
+# Enter the number of activities: 12
+# Start time for Activity 1: 1
+# End time for Activity 1: 4
+# Start time for Activity 2: 3
+# End time for Activity 2: 5
+# Start time for Activity 3: 1
+# End time for Activity 3: 6
+# Start time for Activity 4: 2
+# End time for Activity 4: 7
+# Start time for Activity 5: 3
+# End time for Activity 5: 8
+# Start time for Activity 6: 5
+# End time for Activity 6: 9
+# Start time for Activity 7: 6
+# End time for Activity 7: 9
+# Start time for Activity 8: 7
+# End time for Activity 8: 10
+# Start time for Activity 9: 8
+# End time for Activity 9: 11
+# Start time for Activity 10: 7
+# End time for Activity 10: 12
+# Start time for Activity 11: 12
+# End time for Activity 11: 14
+# Start time for Activity 12: 12
+# End time for Activity 12: 16
+
+# Activity Data:
+
+# +-----------+-----------+-----------+
+# | Activity  | Start     | End       |
+# +-----------+-----------+-----------+
+# | 1         | 1         | 4         |
+# | 2         | 3         | 5         |
+# | 3         | 1         | 6         |
+# | 4         | 2         | 7         |
+# | 5         | 3         | 8         |
+# | 6         | 5         | 9         |
+# | 7         | 6         | 9         |
+# | 8         | 7         | 10        |
+# | 9         | 8         | 11        |
+# | 10        | 7         | 12        |
+# | 11        | 12        | 14        |
+# | 12        | 12        | 16        |
+# +-----------+-----------+-----------+
+
+# Selected Activities for Maximum Number:
+# +-----------+-----------+-----------+
+# | Activity  | Start     | End       |
+# +-----------+-----------+-----------+
+# | 1         | 1         | 4         |
+# | 2         | 5         | 9         |
+# | 3         | 12        | 14        |
+# +-----------+-----------+-----------+
+

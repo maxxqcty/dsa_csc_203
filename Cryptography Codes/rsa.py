@@ -50,3 +50,34 @@ def rsa_encrypt_decrypt():
 
 # Run the RSA encryption and decryption process with user inputs
 rsa_encrypt_decrypt()
+
+# -----------------------------------------------------------
+# OUTPUT :
+# Enter a prime number p: 13
+# Enter a prime number q: 17
+# Enter a public key exponent e (must be coprime with φ(n)): 19
+# Enter the plaintext (an integer less than n): 12
+
+# Step 1: Calculate n and φ(n)
+# n = p * q = 13 * 17 = 221
+# φ(n) = (p - 1) * (q - 1) = (13 - 1) * (17 - 1) = 192
+
+# Step 2: Finding D with each i value:
+# i = 1, D = (φ(n) * i + 1) / e = (192 * 1 + 1) / 19 = 10.16
+# i = 2, D = (φ(n) * i + 1) / e = (192 * 2 + 1) / 19 = 20.26
+# i = 3, D = (φ(n) * i + 1) / e = (192 * 3 + 1) / 19 = 30.37
+# i = 4, D = (φ(n) * i + 1) / e = (192 * 4 + 1) / 19 = 40.47
+# i = 5, D = (φ(n) * i + 1) / e = (192 * 5 + 1) / 19 = 50.58
+# i = 6, D = (φ(n) * i + 1) / e = (192 * 6 + 1) / 19 = 60.68
+# i = 7, D = (φ(n) * i + 1) / e = (192 * 7 + 1) / 19 = 70.79
+# i = 8, D = (φ(n) * i + 1) / e = (192 * 8 + 1) / 19 = 80.89
+# i = 9, D = (φ(n) * i + 1) / e = (192 * 9 + 1) / 19 = 91.0
+
+# Found D = 91 when i = 9
+
+# Step 3: Encrypting the plaintext
+# Ciphertext = plaintext^e mod n = 12^19 mod 221 = 181
+
+# Step 4: Decrypting the ciphertext
+# Recovered plaintext = ciphertext^D mod n = 181^91 mod 221 = 12
+

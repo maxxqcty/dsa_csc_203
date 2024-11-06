@@ -1,30 +1,6 @@
 from bit_conversion import convert_to_decimal
 from bit_conversion import convert_from_decimal
 
-def convert_to_decimal(num, base):
-    if base == 1:  # Binary
-        return int(num, 2)
-    elif base == 2:  # Decimal
-        return float(num)
-    elif base == 3:  # Octal
-        return int(num, 8)
-    elif base == 4:  # Hexadecimal
-        return int(num, 16)
-    else:
-        raise ValueError("Invalid choice.")
-
-def convert_from_decimal(num, base):
-    if base == 1:  # Binary
-        return bin(int(num))[2:]  # Remove '0b' prefix
-    elif base == 2:  # Decimal
-        return str(num)
-    elif base == 3:  # Octal
-        return oct(int(num))[2:]  # Remove '0o' prefix
-    elif base == 4:  # Hexadecimal
-        return hex(int(num))[2:]  # Remove '0x' prefix
-    else:
-        raise ValueError("Invalid choice.")
-
 def perform_calculation(num1, num2, op, base):
     num1_dec = convert_to_decimal(num1, base)
     num2_dec = convert_to_decimal(num2, base)
@@ -69,3 +45,19 @@ if __name__ == "__main__":
     base = int(base_choice)
     
     execute_calculator(num1, num2, operation, base)
+
+
+# -----------------------------------------------------------
+# OUTPUT :
+
+# Enter the first number: 7456.465
+# Enter the second number: 5632.565
+# Enter the operation (+, -, *, /): +
+# Select base:
+# 1. Binary
+# 2. Decimal
+# 3. Octal
+# 4. Hexadecimal
+# Enter your choice (1-4): 3
+# Result: 15311.252
+

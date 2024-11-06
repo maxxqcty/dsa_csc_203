@@ -32,3 +32,11 @@ if __name__ == "__main__":
     
     else:
         print("Invalid choice. Please select 'E' for encryption or 'D' for decryption.")
+# -----------------------------------------------------------
+# OUTPUT: 
+
+# Do you want to (E)ncrypt or (D)ecrypt? D
+# Enter the message to decrypt: LEWLYPUJLPZHNYLHAALHJOLY
+# Enter the shift (key): 7
+# Decrypted message: EXPERINCEISAGREATTEACHER
+

@@ -77,3 +77,44 @@ class HuffmanCoding:
 if __name__ == "__main__":
     huffman_coding = HuffmanCoding()
     huffman_coding.run_huffman_coding()
+
+
+
+# -----------------------------------------------------------
+# OUTPUT :
+
+# Enter the number of characters: 9
+# Enter character 1: g
+# Frequency for'g': 5
+# Enter character 2: o
+# Frequency for'o': 10
+# Enter character 3: 0
+# Frequency for'0': 15
+# Enter character 4: d
+# Frequency for'd': 7
+# Enter character 5: l
+# Frequency for'l': 8
+# Enter character 6: u
+# Frequency for'u': 9
+# Enter character 7: c
+# Frequency for'c': 4
+# Enter character 8: k
+# Frequency for'k': 8
+# Enter character 9: !
+# Frequency for'!': 9
+# +-----------+-----------+----------------+----------------+----------------+
+# | Character | Frequency | Huffman Code   | Original Bits  | Encoded Bits   |
+# +-----------+-----------+----------------+----------------+----------------+
+# | g         | 5         | 1011           | 40             | 20             |
+# | o         | 10        | 110            | 80             | 30             |
+# | 0         | 15        | 00             | 120            | 30             |
+# | d         | 7         | 1110           | 56             | 28             |
+# | l         | 8         | 1111           | 64             | 32             |
+# | u         | 9         | 011            | 72             | 27             |
+# | c         | 4         | 1010           | 32             | 16             |
+# | k         | 8         | 010            | 64             | 24             |
+# | !         | 9         | 100            | 72             | 27             |
+# +-----------+-----------+----------------+----------------+----------------+
+# | Total                                  | 600            | 234            |
+# +-----------+-----------+----------------+----------------+----------------+
+

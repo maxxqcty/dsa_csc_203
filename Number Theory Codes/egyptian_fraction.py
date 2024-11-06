@@ -40,3 +40,24 @@ egyptian_fractions = egyptian_fraction(numerator, denominator)
 # Display the result as a sum
 print("\nEgyptian fraction representation:")
 print(" + ".join(str(f) for f in egyptian_fractions))
+
+
+# -----------------------------------------------------------
+# OUTPUT :
+
+# Enter the numerator: 13
+# Enter the denominator: 89
+# Starting with fraction: 13/89
+# Step 1: Choose unit fraction 1/7
+# Subtracting 1/7 from 13/89
+# Remaining fraction after step 1: 2/623
+
+# Step 2: Choose unit fraction 1/312
+# Subtracting 1/312 from 2/623
+# Remaining fraction after step 2: 1/194376
+
+# Final step: Choose unit fraction 1/194376
+
+# Egyptian fraction representation:
+# 1/7 + 1/312 + 1/194376
+

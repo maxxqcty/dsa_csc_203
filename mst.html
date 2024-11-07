@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drag and Connect Circles</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            user-select: none;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        .circle {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: rgb(255, 255, 255);
+            color: rgb(0, 0, 0);
+            display: flex;
+            border: 2px solid black;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+            cursor: pointer;
+        }
+        .line {
+            position: absolute;
+            background-color: rgb(0, 0, 0);
+            height: 2px;
+            transform-origin: left center;
+            z-index: 1;
+        }
+        .line.highlight {
+            background-color: rgb(255, 0, 0); /* Highlight color for MST edges */
+        }
+        .weight {
+            position: absolute;
+            color: black;
+            margin: 20px;
+            font-size: 15px;
+            padding: 1px 3px;
+            border-radius: 20px;
+            transform: translate(-50%, -50%);
+            white-space: nowrap;
+        }
+        #algorithmOptions {
+            position: fixed;
+            bottom: 20px;
+            left: 40px;
+            font-size: 50px;
+        }
+        #algorithmOptions label {
+            font-weight: bold;
+            font-size: 20px;
+        }
+        #algorithmOptions select, #algorithmOptions button {
+            font-size: 20px;
+        }
+        #mstResult {
+            position: fixed;
+      
+            right: 40px;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+            max-height: 300px;
+            overflow-y: auto;
+            width: 300px;
+        }
+        #mstResult table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        #mstResult th, #mstResult td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        #mstResult th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body onmousedown="createCircle(event)" onmousemove="drawLine(event)" onmouseup="endLine(event)">
+
+<div id="algorithmOptions" style="display: block;">
+    <label for="algorithm">Choose Algorithm:</label>
+    <select id="algorithm">
+        <option value="kruskal">Kruskal's Algorithm</option>
+        <option value="prim">Prim's Algorithm</option>
+        <option value="boruvka">Borůvka's Algorithm</option>
+        <option value="dijkstra">Dijkstra's Algorithm</option>
+    </select>
+    <button onclick="calculateMST()">Calculate</button>
+</div>
+
+<div id="mstResult">
+    <h3>Minimum Spanning Tree</h3>
+    <table id="mstTable">
+        <thead>
+            <tr>
+                <th>Edge</th>
+                <th>Weight</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- MST result rows will go here -->
+        </tbody>
+    </table>
+    <p id="totalWeight">Total Weight: </p>
+</div>
+
+<script>
+    let startCircle = null;
+    let currentLine = null;
+    let circleCount = 0;
+    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const edges = [];
+    const nodes = {};
+
+    function createCircle(event) {
+        const clickedElement = document.elementFromPoint(event.clientX, event.clientY);
+        if (clickedElement && (clickedElement.closest('#algorithmOptions') || clickedElement.classList.contains('circle') || clickedElement.closest('#mstResult'))) {
+            return;
+        }
+        if (clickedElement && clickedElement.classList.contains('circle')) return;
+     
+
+
+        const threshold = 50;
+        const circles = document.querySelectorAll('.circle');
+        for (const existingCircle of circles) {
+            const rect = existingCircle.getBoundingClientRect();
+            const existingX = rect.left + rect.width / 2;
+            const existingY = rect.top + rect.height / 2;
+            const distance = Math.sqrt(Math.pow(existingX - event.clientX, 2) + Math.pow(existingY - event.clientY, 2));
+            if (distance < threshold) return;
+        }
+
+        if (circleCount < alphabet.length) {
+            const circle = document.createElement('div');
+            circle.classList.add('circle');
+            circle.textContent = alphabet[circleCount];
+            nodes[alphabet[circleCount]] = { x: event.clientX, y: event.clientY };
+            circle.style.left = `${event.clientX}px`;
+            circle.style.top = `${event.clientY}px`;
+
+            circleCount++;
+
+            circle.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                startLine(e, circle);
+            });
+
+            document.body.appendChild(circle);
+        }
+    }
+
+    function startLine(event, circle) {
+        event.stopPropagation();
+        startCircle = circle;
+        startCircle.style.backgroundColor = 'gray';
+
+        currentLine = document.createElement('div');
+        currentLine.classList.add('line');
+        document.body.appendChild(currentLine);
+
+        const rect = startCircle.getBoundingClientRect();
+        const startX = rect.left + rect.width / 2;
+        const startY = rect.top + rect.height / 2;
+
+        currentLine.style.left = `${startX}px`;
+        currentLine.style.top = `${startY}px`;
+    }
+
+    function drawLine(event) {
+        if (!currentLine) return;
+
+        event.preventDefault();
+        const rect = startCircle.getBoundingClientRect();
+        const startX = rect.left + rect.width / 2;
+        const startY = rect.top + rect.height / 2;
+        const endX = event.clientX;
+        const endY = event.clientY;
+
+        const dx = endX - startX;
+        const dy = endY - startY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+
+        currentLine.style.width = `${distance}px`;
+        currentLine.style.transform = `rotate(${angle}deg)`;
+    }
+
+    function endLine(event) {
+        if (!currentLine) return;
+
+        const endCircle = document.elementFromPoint(event.clientX, event.clientY);
+        if (endCircle && endCircle.classList.contains('circle') && endCircle !== startCircle) {
+            const startLabel = startCircle.textContent;
+            const endLabel = endCircle.textContent;
+
+            const startRect = startCircle.getBoundingClientRect();
+            const endRect = endCircle.getBoundingClientRect();
+            const startX = startRect.left + startRect.width / 2;
+            const startY = startRect.top + startRect.height / 2;
+            const endX = endRect.left + endRect.width / 2;
+            const endY = endRect.top + endRect.height / 2;
+
+            const weight = prompt("Enter weight for the edge:", "1");
+
+            edges.push({ start: startLabel, end: endLabel, weight: parseInt(weight) });
+
+            const weightDisplay = document.createElement('div');
+            weightDisplay.classList.add('weight');
+            weightDisplay.textContent = weight;
+            document.body.appendChild(weightDisplay);
+
+            // Calculate the midpoint for the weight
+            const weightX = (startX + endX) / 2;
+            const weightY = (startY + endY) / 2;
+
+            // Determine the offset based on the angle
+            const dy = endY - startY;
+            const dx = endX - startX;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+
+            // Set vertical or horizontal offset based on the angle
+            const offset = 20;
+            const horizontalOffset = Math.abs(angle) > 50 && Math.abs(angle) < 100 ? 15 : 5; // Adjusts for near-vertical angles
+
+            // Position the weight display with adjusted offsets
+            weightDisplay.style.left = `${weightX + horizontalOffset}px`;
+            weightDisplay.style.top = `${weightY + offset}px`;
+
+            currentLine.style.width = `${Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2))}px`;
+            currentLine.style.left = `${startX}px`;
+            currentLine.style.top = `${startY}px`;
+            currentLine.style.transform = `rotate(${Math.atan2(endY - startY, endX - startX) * (180 / Math.PI)}deg)`;
+
+            currentLine.setAttribute('data-start', startLabel);
+            currentLine.setAttribute('data-end', endLabel);
+            currentLine.setAttribute('data-weight', weight);
+
+        } else {
+            currentLine.remove();
+        }
+
+        if (startCircle) {
+            startCircle.style.backgroundColor = 'white';
+        }
+        startCircle = null;
+        currentLine = null;
+    }
+    function calculateMST() {
+    const algorithm = document.getElementById('algorithm').value;
+    let result;
+
+    switch (algorithm) {
+        case 'kruskal':
+            result = kruskalMST(edges);
+            break;
+        case 'prim':
+            result = primMST(nodes, edges);
+            break;
+        case 'boruvka':
+            result = boruvkaMST(edges);
+            break;
+        case 'dijkstra':
+            result = dijkstraShortestPath(edges);
+            break;
+        default:
+            alert("Invalid algorithm selection");
+            return;
+    }
+
+    displayMSTResult(result);
+}
+
+function displayMSTResult(result) {
+    const mstDiv = document.getElementById('mstResult');
+    const mstTable = document.getElementById('mstTable').getElementsByTagName('tbody')[0];
+
+    mstTable.innerHTML = ''; // Clear existing rows
+    let totalWeight = 0;
+
+    // Clear previous highlights
+    const lines = document.querySelectorAll('.line');
+    lines.forEach(line => {
+        line.classList.remove('highlight');
+    });
+
+    result.edges.forEach(edge => {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td>${edge.start} - ${edge.end}</td><td>${edge.weight}</td>`;
+        mstTable.appendChild(row);
+        totalWeight += edge.weight;
+
+        // Find and highlight the edge line
+        const line = [...lines].find(l => 
+            l.getAttribute('data-start') === edge.start && 
+            l.getAttribute('data-end') === edge.end
+        );
+        if (line) {
+            line.classList.add('highlight');
+        }
+    });
+
+    document.getElementById('totalWeight').textContent = `Total Weight: ${totalWeight}`;
+    mstDiv.style.display = 'block';
+}
+
+function kruskalMST(edges) {
+    // Implement Kruskal's algorithm with union-find for cycle detection
+    edges.sort((a, b) => a.weight - b.weight);
+    const parent = {};
+    const rank = {};
+
+    function find(node) {
+        if (parent[node] === undefined) parent[node] = node;
+        if (parent[node] !== node) parent[node] = find(parent[node]);
+        return parent[node];
+    }
+
+    function union(node1, node2) {
+        const root1 = find(node1);
+        const root2 = find(node2);
+
+        if (root1 !== root2) {
+            if (rank[root1] > rank[root2]) {
+                parent[root2] = root1;
+            } else if (rank[root1] < rank[root2]) {
+                parent[root1] = root2;
+            } else {
+                parent[root2] = root1;
+                rank[root1] = (rank[root1] || 0) + 1;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    const mstEdges = [];
+    edges.forEach(edge => {
+        if (union(edge.start, edge.end)) {
+            mstEdges.push(edge);
+        }
+    });
+
+    return {
+        edges: mstEdges,
+    };
+}
+
+function primMST(nodes, edges) {
+        const startNode = Object.keys(nodes)[0]; // Start from the first node in the nodes object
+        const visited = new Set();
+        const mstEdges = [];
+        let totalWeight = 0;
+
+        // Create a priority queue with edges starting from the first node
+        const minHeap = [];
+        edges.forEach(edge => {
+            if (edge.start === startNode || edge.end === startNode) {
+                minHeap.push(edge);
+            }
+        });
+
+        // Sort initially by weight to treat minHeap as priority queue
+        minHeap.sort((a, b) => a.weight - b.weight);
+
+        visited.add(startNode);
+
+        // Process the priority queue until MST includes all nodes
+        while (minHeap.length && visited.size < Object.keys(nodes).length) {
+            const edge = minHeap.shift(); // Get the edge with minimum weight
+
+            // Check if the edge connects a visited node to an unvisited node
+            if (visited.has(edge.start) && !visited.has(edge.end)) {
+                visited.add(edge.end);
+                mstEdges.push(edge);
+                totalWeight += edge.weight;
+
+                // Add new edges to the heap from the newly visited node
+                edges.forEach(newEdge => {
+                    if ((newEdge.start === edge.end && !visited.has(newEdge.end)) ||
+                        (newEdge.end === edge.end && !visited.has(newEdge.start))) {
+                        minHeap.push(newEdge);
+                    }
+                });
+
+                // Sort the heap again based on weight after adding new edges
+                minHeap.sort((a, b) => a.weight - b.weight);
+            } else if (visited.has(edge.end) && !visited.has(edge.start)) {
+                visited.add(edge.start);
+                mstEdges.push(edge);
+                totalWeight += edge.weight;
+
+                edges.forEach(newEdge => {
+                    if ((newEdge.start === edge.start && !visited.has(newEdge.end)) ||
+                        (newEdge.end === edge.start && !visited.has(newEdge.start))) {
+                        minHeap.push(newEdge);
+                    }
+                });
+
+                minHeap.sort((a, b) => a.weight - b.weight);
+            }
+        }
+
+        return {
+            edges: mstEdges,
+        };
+    }
+
+
+
+
+</script>
+
+</body>
+</html>

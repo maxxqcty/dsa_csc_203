@@ -1,4 +1,4 @@
-
+import graphviz
 import os
 import time
 import heapq
@@ -98,12 +98,16 @@ def get_user_input():
 
     return sp
 
-if __name__ == "__main__":
+def run_dijkstra():
     sp = get_user_input()
     print("Enter the source node:")
     source = int(input().strip())
     sp.dijkstra(source)
     sp.visualize_full_graph()
     sp.visualize_shortest_path_tree()
+
+if __name__ == "__main__":
+    run_dijkstra()
+
 
     

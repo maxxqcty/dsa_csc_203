@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Huffman Tree Generator</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1300px;
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        .input-section {
+            display: flex;
+            justify-content: space-between;
+            gap: 50px;
+            margin-bottom: 40px;
+        }
+
+        label {
+            font-size: 20px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        input[type="text"] {
+            padding: 15px;
+            width: 45%;
+            font-size: 18px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            transition: border 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+
+        button {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            padding: 15px 30px;
+            font-size: 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #45a049, #4CAF50);
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .bottom-section {
+            display: flex;
+            justify-content: space-between;
+            gap: 50px;
+        }
+
+        .graph-container {
+            width: 65%;
+            height: 500px;
+            border: 3px solid #ddd;
+            background-color: #f8f8f8;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            color: #333;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .table-container {
+            width: 30%;
+            height: 500px;
+            overflow-y: auto;
+            border: 3px solid #ddd;
+            border-radius: 12px;
+            background-color: #fafafa;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 15px;
+            text-align: left;
+            font-size: 18px;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        td {
+            background-color: #f9f9f9;
+        }
+        td:nth-child(odd) {
+            background-color: #f1f1f1;
+        }
+
+        td:hover {
+            background-color: #f0f8f0;
+            cursor: pointer;
+        }
+        td, th {
+    font-size: 16px;  /* Reduce the font size */
+    padding: 10px;    /* Adjust padding */
+}
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="input-section">
+            <label for="symbols">Symbols: </label>
+            <input type="text" id="symbols" placeholder="e.g. A,B,C">
+            <label for="frequency">Frequency: </label>
+            <input type="text" id="frequency" placeholder="e.g. 5,9,12">
+            <button onclick="generateTree()">Generate Tree</button>
+        </div>
+
+        <div class="bottom-section">
+            <div class="graph-container">
+                <canvas id="huffmanCanvas" width="600" height="400"></canvas>
+            </div>
+
+            <div class="table-container">
+                <table id="huffmanTable">
+                    <thead>
+                        <tr>
+                            <th>Symbol</th>
+                            <th>Frequency</th>
+                            <th>Huffman Code</th>
+                            <th>Bits</th>
+                            <th>Bits * Frequency</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data will be inserted here dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class Node {
+            constructor(symbol, freq) {
+                this.symbol = symbol;
+                this.freq = freq;
+                this.left = null;
+                this.right = null;
+            }
+        }
+    
+        function generateTree() {
+            const symbolsInput = document.getElementById('symbols').value.split(',');
+            const frequencyInput = document.getElementById('frequency').value.split(',').map(Number);
+    
+            if (symbolsInput.length !== frequencyInput.length) {
+                alert("Symbols and frequencies must have the same number of values.");
+                return;
+            }
+    
+            const nodes = [];
+            for (let i = 0; i < symbolsInput.length; i++) {
+                nodes.push(new Node(symbolsInput[i], frequencyInput[i]));
+            }
+    
+            const huffmanTree = buildHuffmanTree(nodes);
+            const huffmanCodes = generateHuffmanCodes(huffmanTree);
+            updateTable(symbolsInput, frequencyInput, huffmanCodes);
+            drawHuffmanTree(huffmanTree);
+        }
+    
+        function buildHuffmanTree(nodes) {
+            while (nodes.length > 1) {
+                nodes.sort((a, b) => a.freq - b.freq);
+                const left = nodes.shift();
+                const right = nodes.shift();
+                const newNode = new Node(null, left.freq + right.freq);
+                newNode.left = left;
+                newNode.right = right;
+                nodes.push(newNode);
+            }
+            return nodes[0];
+        }
+    
+        function generateHuffmanCodes(node, prefix = '') {
+            if (!node) return [];
+            if (node.symbol !== null) {
+                return [{ symbol: node.symbol, huffmanCode: prefix, bits: prefix.length }];
+            }
+            return [
+                ...generateHuffmanCodes(node.left, prefix + '0'),
+                ...generateHuffmanCodes(node.right, prefix + '1')
+            ];
+        }
+    
+        function updateTable(symbols, frequencies, huffmanCodes) {
+    const tableBody = document.getElementById('huffmanTable').querySelector('tbody');
+    tableBody.innerHTML = '';
+    let totalBitsFreq = 0;
+
+    huffmanCodes.forEach((code) => {
+        const bitsFreq = code.bits * frequencies[symbols.indexOf(code.symbol)];
+        totalBitsFreq += bitsFreq;
+        const row = tableBody.insertRow();
+        row.innerHTML = `
+            <td>${code.symbol}</td>
+            <td>${frequencies[symbols.indexOf(code.symbol)]}</td>
+            <td>${code.huffmanCode}</td>
+            <td>${code.bits}</td>
+            <td>${bitsFreq}</td>
+        `;
+    });
+
+    // Add a row at the bottom for the total Bits * Frequency
+    const totalRow = tableBody.insertRow();
+    totalRow.innerHTML = `
+        <td colspan="4" style="text-align: right; font-weight: bold;">Total Bits * Frequency:</td>
+        <td style="font-weight: bold;">${totalBitsFreq}</td>
+    `;
+}
+    
+        function drawHuffmanTree(node, ctx = null, x = 300, y = 20, level = 0, offset = 50, maxDepth = 0) {
+            if (!node) return;
+
+            // Calculate the maximum depth for proper spacing
+            if (maxDepth === 0) maxDepth = calculateMaxDepth(node);
+
+            // Calculate horizontal offset based on tree depth
+            const spacePerLevel = 150;  // Horizontal space per level
+
+            // Start drawing
+            if (!ctx) {
+                const canvas = document.getElementById("huffmanCanvas");
+                ctx = canvas.getContext("2d");
+
+                // Set high resolution
+                const scale = window.devicePixelRatio; // This will scale the canvas resolution
+                canvas.width = canvas.width * scale;
+                canvas.height = canvas.height * scale;
+                ctx.scale(scale, scale);  // Scale the context for higher resolution
+            }
+
+            ctx.fillStyle = "#333"; // Set text color
+            ctx.font = "16px Roboto"; // Increase font size for clarity
+            if (node.symbol !== null) {
+    ctx.fillText(`${node.symbol}(${node.freq})`, x, y);
+} else {
+    ctx.fillText(`(${node.freq})`, x, y);
+}
+
+
+            if (node.left) {
+                const newX = x - spacePerLevel / Math.pow(2, level);
+                const newY = y + 60;
+                ctx.beginPath();
+                ctx.moveTo(x, y + 10);
+                ctx.lineTo(newX, newY - 10);
+                ctx.lineWidth = 3;  // Set thicker lines
+                ctx.strokeStyle = "#333";  // Set line color
+                ctx.stroke();
+                drawHuffmanTree(node.left, ctx, newX, newY, level + 1, spacePerLevel, maxDepth);
+            }
+            if (node.right) {
+                const newX = x + spacePerLevel / Math.pow(2, level);
+                const newY = y + 60;
+                ctx.beginPath();
+                ctx.moveTo(x, y + 10);
+                ctx.lineTo(newX, newY - 10);
+                ctx.lineWidth = 3;  // Set thicker lines
+                ctx.strokeStyle = "#333";  // Set line color
+                ctx.stroke();
+                drawHuffmanTree(node.right, ctx, newX, newY, level + 1, spacePerLevel, maxDepth);
+            }
+        }
+
+        function calculateMaxDepth(node) {
+            if (!node) return 0;
+            const leftDepth = calculateMaxDepth(node.left);
+            const rightDepth = calculateMaxDepth(node.right);
+            return Math.max(leftDepth, rightDepth) + 1;
+        }
+    </script>
+
+</body>
+</html>

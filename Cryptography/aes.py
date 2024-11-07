@@ -1,0 +1,614 @@
+
+
+def keyExpansion(key,numround,rci,s_box):
+    round_const = rci[numround-1]
+    gw3 = [key[3][1],key[3][2],key[3][3],key[3][0]]
+    for i in range(4):
+        u = hex(s_box[int(gw3[i][2],16)][int(gw3[i][3],16)])
+        if(u == "0x0"):
+            u = "0x00"
+        elif(len(u.lstrip("0x"))<=1):
+            u = "0x0"+u.lstrip("0x")
+        gw3[i] = u
+    a = 1
+    b = 1
+    if(gw3[0] == "0x00" or gw3[0] == "0x0"):
+        a = 0
+    else:
+        a = int(gw3[0].lstrip("0x"),16)
+    x = hex(int(a^int(round_const.lstrip("0x"),16)))
+    if(x == "0x0"):
+        x = "0x00"
+    elif(len(x.lstrip("0x"))<=1):
+        x = "0x0"+x.lstrip("0x")
+    gw3[0] = x
+    w4 = []
+    for i in range(4):
+        r = 1
+        p = 1
+        if(gw3[i] == "0x00" or gw3[i] == "0x0"):
+            r = 0
+        else:
+            r = int(gw3[i].lstrip("0x"),16)
+        if(key[0][i] == "0x00" or key[0][i] == "0x0"):
+            p = 0
+        else:
+            p = int(key[0][i].lstrip("0x"),16)
+        y = hex(r^p)
+        if(y == "0x0"):
+            y = "0x00"
+        elif(len(y.lstrip("0x")) <= 1):
+            y = "0x0"+y.lstrip("0x")
+        w4.append(y)
+    w5 = []
+    w6 = []
+    w7 = []
+    for i in range(4):
+        r = 1
+        p = 1
+        if(w4[i] == "0x00" or w4[i] == "0x0"):
+            r = 0
+        else:
+            r = int(w4[i].lstrip("0x"),16)
+        if(key[1][i] == "0x00" or key[1][i] == "0x0"):
+            p = 0
+        else:
+            p = int(key[1][i].lstrip("0x"),16)
+        y = hex(r^p)
+        if(y == "0x0"):
+            y = "0x00"
+        elif(len(y.lstrip("0x")) <= 1):
+            y = "0x0"+y.lstrip("0x")
+        w5.append(y)
+    for i in range(4):
+        r = 1
+        p = 1
+        if(w5[i] == "0x00" or w5[i] == "0x0"):
+            r = 0
+        else:
+            r = int(w5[i].lstrip("0x"),16)
+        if(key[2][i] == "0x00" or key[2][i] == "0x0"):
+            p = 0
+        else:
+            p = int(key[2][i].lstrip("0x"),16)
+        y = hex(r^p)
+        if(y == "0x0"):
+            y = "0x00"
+        elif(len(y.lstrip("0x")) <= 1):
+            y = "0x0"+y.lstrip("0x")
+        w6.append(y)
+    for i in range(4):
+        r = 1
+        p = 1
+        if(w6[i] == "0x00" or w6[i] == "0x0"):
+            r = 0
+        else:
+            r = int(w6[i].lstrip("0x"),16)
+        if(key[3][i] == "0x00" or key[3][i] == "0x0"):
+            p = 0
+        else:
+            p = int(key[3][i].lstrip("0x"),16)
+        y = hex(r^p)
+        if(y == "0x0"):
+            y = "0x00"
+        elif(len(y.lstrip("0x")) <= 1):
+            y = "0x0"+y.lstrip("0x")
+        w7.append(y)
+    return [w4,w5,w6,w7]
+
+def addRoundKey(pt,rk):
+    for i in range(4):
+        for j in range(4):
+            x = 0
+            y = 0
+            if(pt[j][i] != "0x00"):
+                x = int(pt[j][i].lstrip("0x"),16)
+            if(rk[j][i] != "0x00"):
+                y = int(rk[j][i].lstrip("0x"),16)
+            z = hex(x^y)
+            if(z == "0x0"):
+                z = "0x00"
+            elif(len(z.lstrip("0x")) <= 1):
+                z = "0x0"+z.lstrip("0x")
+            pt[j][i] = z
+    return pt
+
+def substitute(pt,s_box):
+    for i in range(4):
+        for j in range(4):
+            u = hex(s_box[int(pt[i][j][2],16)][int(pt[i][j][3],16)])
+            if(u == "0x0"):
+                u = "0x00"
+            elif(len(u.lstrip("0x"))<=1):
+                u = "0x0"+u.lstrip("0x")
+            pt[i][j] = u
+    return pt
+
+def shiftRow(pt):
+    pt[0][1],pt[1][1],pt[2][1],pt[3][1] = pt[1][1],pt[2][1],pt[3][1],pt[0][1]
+    pt[0][2],pt[1][2],pt[2][2],pt[3][2] = pt[2][2],pt[3][2],pt[0][2],pt[1][2]
+    pt[0][3],pt[1][3],pt[2][3],pt[3][3] = pt[3][3],pt[0][3],pt[1][3],pt[2][3]
+    return pt
+
+def mixMulCol(col,mul2,mul3):
+    temp = []
+    i = mul2[int(col[0][2],16)][int(col[0][3],16)]
+    j = mul3[int(col[1][2],16)][int(col[1][3],16)]
+    k = int(col[2],16)
+    l = int(col[3],16)
+    m = hex(i^j^k^l)
+    if(m == "0x0"):
+        m = "0x00"
+    elif(len(m.lstrip("0x")) <= 1):
+        m = "0x0"+m.lstrip("0x")
+    temp.append(m)
+
+    i = int(col[0],16)
+    j = mul2[int(col[1][2],16)][int(col[1][3],16)]
+    k = mul3[int(col[2][2],16)][int(col[2][3],16)]
+    l = int(col[3],16)
+    m = hex(i^j^k^l)
+    if(m == "0x0"):
+        m = "0x00"
+    elif(len(m.lstrip("0x")) <= 1):
+        m = "0x0"+m.lstrip("0x")
+    temp.append(m)
+
+    i = int(col[0],16)
+    j = int(col[1],16)
+    k = mul2[int(col[2][2],16)][int(col[2][3],16)]
+    l = mul3[int(col[3][2],16)][int(col[3][3],16)]
+    m = hex(i^j^k^l)
+    if(m == "0x0"):
+        m = "0x00"
+    elif(len(m.lstrip("0x")) <= 1):
+        m = "0x0"+m.lstrip("0x")
+    temp.append(m)
+
+    i = mul3[int(col[0][2],16)][int(col[0][3],16)]
+    j = int(col[1],16)
+    k = int(col[2],16)
+    l = mul2[int(col[3][2],16)][int(col[3][3],16)]
+    m = hex(i^j^k^l)
+    if(m == "0x0"):
+        m = "0x00"
+    elif(len(m.lstrip("0x")) <= 1):
+        m = "0x0"+m.lstrip("0x")
+    temp.append(m)
+    return temp
+def mixCol(mul2,mul3,pt):
+    res = []
+    for i in range(4):
+        temp = []
+        temp.append(pt[i][0])
+        temp.append(pt[i][1])
+        temp.append(pt[i][2])
+        temp.append(pt[i][3])
+        res.append(mixMulCol(temp,mul2,mul3))
+    return res
+def printMatrix(m):
+    for i in range(4):
+        for j in range(4):
+            y = m[j][i]
+            if(y == "0x00"):
+                y = "00"
+            elif(len(y.lstrip("0x")) <= 1):
+                y = "0"+y.lstrip("0x")
+            else:
+                y = y.lstrip("0x")
+            print(y.upper(),end=" ")
+        print(" ")
+def printCipher(m):
+    for i in range(4):
+        for j in range(4):
+            y = m[i][j]
+            if(y == "0x00"):
+                y = "00"
+            elif(len(y.lstrip("0x")) <= 1):
+                y = "0"+y.lstrip("0x")
+            else:
+                y = y.lstrip("0x")
+            print(y.upper(),end=" ")
+    print(" ")
+
+def run_aes():
+        plainText = input("Enter plain text in multiple of 16 bytes: ")
+        key = input("Enter key in multiple of 16 bytes: ")
+        s_box = [
+            [0x63, 0x7C, 0x77, 0x7B, 0xF2, 0x6B, 0x6F, 0xC5, 0x30, 0x01, 0x67, 0x2B, 0xFE, 0xD7, 0xAB, 0x76],
+            [0xCA, 0x82, 0xC9, 0x7D, 0xFA, 0x59, 0x47, 0xF0, 0xAD, 0xD4, 0xA2, 0xAF, 0x9C, 0xA4, 0x72, 0xC0],
+            [0xB7, 0xFD, 0x93, 0x26, 0x36, 0x3F, 0xF7, 0xCC, 0x34, 0xA5, 0xE5, 0xF1, 0x71, 0xD8, 0x31, 0x15],
+            [0x04, 0xC7, 0x23, 0xC3, 0x18, 0x96, 0x05, 0x9A, 0x07, 0x12, 0x80, 0xE2, 0xEB, 0x27, 0xB2, 0x75],
+            [0x09, 0x83, 0x2C, 0x1A, 0x1B, 0x6E, 0x5A, 0xA0, 0x52, 0x3B, 0xD6, 0xB3, 0x29, 0xE3, 0x2F, 0x84],
+            [0x53, 0xD1, 0x00, 0xED, 0x20, 0xFC, 0xB1, 0x5B, 0x6A, 0xCB, 0xBE, 0x39, 0x4A, 0x4C, 0x58, 0xCF],
+            [0xD0, 0xEF, 0xAA, 0xFB, 0x43, 0x4D, 0x33, 0x85, 0x45, 0xF9, 0x02, 0x7F, 0x50, 0x3C, 0x9F, 0xA8],
+            [0x51, 0xA3, 0x40, 0x8F, 0x92, 0x9D, 0x38, 0xF5, 0xBC, 0xB6, 0xDA, 0x21, 0x10, 0xFF, 0xF3, 0xD2],
+            [0xCD, 0x0C, 0x13, 0xEC, 0x5F, 0x97, 0x44, 0x17, 0xC4, 0xA7, 0x7E, 0x3D, 0x64, 0x5D, 0x19, 0x73],
+            [0x60, 0x81, 0x4F, 0xDC, 0x22, 0x2A, 0x90, 0x88, 0x46, 0xEE, 0xB8, 0x14, 0xDE, 0x5E, 0x0B, 0xDB],
+            [0xE0, 0x32, 0x3A, 0x0A, 0x49, 0x06, 0x24, 0x5C, 0xC2, 0xD3, 0xAC, 0x62, 0x91, 0x95, 0xE4, 0x79],
+            [0xE7, 0xC8, 0x37, 0x6D, 0x8D, 0xD5, 0x4E, 0xA9, 0x6C, 0x56, 0xF4, 0xEA, 0x65, 0x7A, 0xAE, 0x08],
+            [0xBA, 0x78, 0x25, 0x2E, 0x1C, 0xA6, 0xB4, 0xC6, 0xE8, 0xDD, 0x74, 0x1F, 0x4B, 0xBD, 0x8B, 0x8A],
+            [0x70, 0x3E, 0xB5, 0x66, 0x48, 0x03, 0xF6, 0x0E, 0x61, 0x35, 0x57, 0xB9, 0x86, 0xC1, 0x1D, 0x9E],
+            [0xE1, 0xF8, 0x98, 0x11, 0x69, 0xD9, 0x8E, 0x94, 0x9B, 0x1E, 0x87, 0xE9, 0xCE, 0x55, 0x28, 0xDF],
+            [0x8C, 0xA1, 0x89, 0x0D, 0xBF, 0xE6, 0x42, 0x68, 0x41, 0x99, 0x2D, 0x0F, 0xB0, 0x54, 0xBB, 0x16]
+        ]
+        rci = ["0x01","0x02","0x04","0x08","0x10","0x20","0x40","0x80","0x1B","0x36"]
+        mul2 = [
+            [0x00,0x02,0x04,0x06,0x08,0x0a,0x0c,0x0e,0x10,0x12,0x14,0x16,0x18,0x1a,0x1c,0x1e],
+        [0x20,0x22,0x24,0x26,0x28,0x2a,0x2c,0x2e,0x30,0x32,0x34,0x36,0x38,0x3a,0x3c,0x3e],
+        [0x40,0x42,0x44,0x46,0x48,0x4a,0x4c,0x4e,0x50,0x52,0x54,0x56,0x58,0x5a,0x5c,0x5e],
+        [0x60,0x62,0x64,0x66,0x68,0x6a,0x6c,0x6e,0x70,0x72,0x74,0x76,0x78,0x7a,0x7c,0x7e],
+        [0x80,0x82,0x84,0x86,0x88,0x8a,0x8c,0x8e,0x90,0x92,0x94,0x96,0x98,0x9a,0x9c,0x9e],
+        [0xa0,0xa2,0xa4,0xa6,0xa8,0xaa,0xac,0xae,0xb0,0xb2,0xb4,0xb6,0xb8,0xba,0xbc,0xbe],
+        [0xc0,0xc2,0xc4,0xc6,0xc8,0xca,0xcc,0xce,0xd0,0xd2,0xd4,0xd6,0xd8,0xda,0xdc,0xde],
+        [0xe0,0xe2,0xe4,0xe6,0xe8,0xea,0xec,0xee,0xf0,0xf2,0xf4,0xf6,0xf8,0xfa,0xfc,0xfe],
+        [0x1b,0x19,0x1f,0x1d,0x13,0x11,0x17,0x15,0x0b,0x09,0x0f,0x0d,0x03,0x01,0x07,0x05],
+        [0x3b,0x39,0x3f,0x3d,0x33,0x31,0x37,0x35,0x2b,0x29,0x2f,0x2d,0x23,0x21,0x27,0x25],
+        [0x5b,0x59,0x5f,0x5d,0x53,0x51,0x57,0x55,0x4b,0x49,0x4f,0x4d,0x43,0x41,0x47,0x45],
+        [0x7b,0x79,0x7f,0x7d,0x73,0x71,0x77,0x75,0x6b,0x69,0x6f,0x6d,0x63,0x61,0x67,0x65],
+        [0x9b,0x99,0x9f,0x9d,0x93,0x91,0x97,0x95,0x8b,0x89,0x8f,0x8d,0x83,0x81,0x87,0x85],
+        [0xbb,0xb9,0xbf,0xbd,0xb3,0xb1,0xb7,0xb5,0xab,0xa9,0xaf,0xad,0xa3,0xa1,0xa7,0xa5],
+        [0xdb,0xd9,0xdf,0xdd,0xd3,0xd1,0xd7,0xd5,0xcb,0xc9,0xcf,0xcd,0xc3,0xc1,0xc7,0xc5],
+        [0xfb,0xf9,0xff,0xfd,0xf3,0xf1,0xf7,0xf5,0xeb,0xe9,0xef,0xed,0xe3,0xe1,0xe7,0xe5]]
+
+        mul3 = [[0x00,0x03,0x06,0x05,0x0c,0x0f,0x0a,0x09,0x18,0x1b,0x1e,0x1d,0x14,0x17,0x12,0x11],
+        [0x30,0x33,0x36,0x35,0x3c,0x3f,0x3a,0x39,0x28,0x2b,0x2e,0x2d,0x24,0x27,0x22,0x21],
+        [0x60,0x63,0x66,0x65,0x6c,0x6f,0x6a,0x69,0x78,0x7b,0x7e,0x7d,0x74,0x77,0x72,0x71],
+        [0x50,0x53,0x56,0x55,0x5c,0x5f,0x5a,0x59,0x48,0x4b,0x4e,0x4d,0x44,0x47,0x42,0x41],
+        [0xc0,0xc3,0xc6,0xc5,0xcc,0xcf,0xca,0xc9,0xd8,0xdb,0xde,0xdd,0xd4,0xd7,0xd2,0xd1],
+        [0xf0,0xf3,0xf6,0xf5,0xfc,0xff,0xfa,0xf9,0xe8,0xeb,0xee,0xed,0xe4,0xe7,0xe2,0xe1],
+        [0xa0,0xa3,0xa6,0xa5,0xac,0xaf,0xaa,0xa9,0xb8,0xbb,0xbe,0xbd,0xb4,0xb7,0xb2,0xb1],
+        [0x90,0x93,0x96,0x95,0x9c,0x9f,0x9a,0x99,0x88,0x8b,0x8e,0x8d,0x84,0x87,0x82,0x81],
+        [0x9b,0x98,0x9d,0x9e,0x97,0x94,0x91,0x92,0x83,0x80,0x85,0x86,0x8f,0x8c,0x89,0x8a],
+        [0xab,0xa8,0xad,0xae,0xa7,0xa4,0xa1,0xa2,0xb3,0xb0,0xb5,0xb6,0xbf,0xbc,0xb9,0xba],
+        [0xfb,0xf8,0xfd,0xfe,0xf7,0xf4,0xf1,0xf2,0xe3,0xe0,0xe5,0xe6,0xef,0xec,0xe9,0xea],
+        [0xcb,0xc8,0xcd,0xce,0xc7,0xc4,0xc1,0xc2,0xd3,0xd0,0xd5,0xd6,0xdf,0xdc,0xd9,0xda],
+        [0x5b,0x58,0x5d,0x5e,0x57,0x54,0x51,0x52,0x43,0x40,0x45,0x46,0x4f,0x4c,0x49,0x4a],
+        [0x6b,0x68,0x6d,0x6e,0x67,0x64,0x61,0x62,0x73,0x70,0x75,0x76,0x7f,0x7c,0x79,0x7a],
+        [0x3b,0x38,0x3d,0x3e,0x37,0x34,0x31,0x32,0x23,0x20,0x25,0x26,0x2f,0x2c,0x29,0x2a],
+        [0x0b,0x08,0x0d,0x0e,0x07,0x04,0x01,0x02,0x13,0x10,0x15,0x16,0x1f,0x1c,0x19,0x1a]]
+
+        initialState = []
+        initialKey = []
+        finalState = []
+        total = 0
+        for i in range(4):
+            temp = []
+            temp1 = []
+            temp2 = []
+            for j in range(4):
+                temp2.append(hex(ord(plainText[total])))
+                temp.append(hex(ord(plainText[total])))
+                temp1.append(hex(ord(key[total])))
+                total+=1
+            initialState.append(temp)
+            initialKey.append(temp1)
+            finalState.append(temp2)
+        print("--------Initial----------")
+        print("Initial Plain text Matrix")
+        printMatrix(initialState)
+        print("Initial Key matrix")
+        printMatrix(initialKey)
+        print("-------------------------")
+        print("---------Round 0---------")
+        print("After round 0 add key")
+        initialState = addRoundKey(initialState,initialKey)
+        printMatrix(initialState)
+        for i in range(1,11):
+            print("--------Round "+str(i)+"---------")
+            initialKey = keyExpansion(initialKey,i,rci,s_box)
+            print("This round Key")
+            printMatrix(initialKey)
+            print("After Susbstitution")
+            initialState = substitute(initialState,s_box)
+            printMatrix(initialState)
+
+            print("After shift rows")
+            initialState = shiftRow(initialState)
+            printMatrix(initialState)
+            if(i!=10):
+                print("After Mix column")
+                initialState = mixCol(mul2,mul3,initialState)
+                printMatrix(initialState)
+
+            print("After add round key")
+            initialState = addRoundKey(initialState,initialKey)
+            printMatrix(initialState)
+        print("-----------Result----------")
+        print("Original Message")
+        printCipher(finalState)
+        print("The cipher text is")
+        printCipher(initialState)
+ 
+if __name__ == "__main__":
+   run_aes()
+
+#  -----------------------------------------------------------
+# OUTPUT :
+
+
+# Enter plain text in multiple of 16 bytes: NEGROS ORIENTAL
+# Enter key in multiple of 16 bytes: STATE UNIVERSITY
+# --------Initial----------
+# Initial Plain text Matrix
+# 4E 4F 52 54  
+# 45 53 49 41  
+# 47 20 45 4C  
+# 52 4F 4E 20  
+# Initial Key matrix
+# 53 45 49 53  
+# 54 20 56 49  
+# 41 55 45 54  
+# 54 4E 52 59  
+# -------------------------
+# ---------Round 0---------
+# After round 0 add key
+# 1D 0A 1B 07  
+# 11 73 1F 08  
+# 06 75 00 18  
+# 06 01 1C 79  
+# --------Round 1---------
+# This round Key
+# 69 2C 65 36  
+# 74 54 02 4B  
+# 8A DF 9A CE  
+# B9 F7 A5 FC  
+# After Susbstitution
+# A4 67 AF C5
+# 82 8F C0 30
+# 6F 9D 63 AD
+# 6F 7C 9C B6
+# After shift rows
+# A4 67 AF C5
+# 8F C0 30 82
+# 63 AD 6F 9D
+# B6 6F 7C 9C
+# After Mix column
+# 0C 57 06 0D
+# B2 7F 02 FA
+# 2C 57 C5 D9
+# 6C 1A 4D 68
+# After add round key
+# 65 7B 63 3B
+# C6 2B 00 B1
+# A6 88 5F 17
+# D5 ED E8 94
+# --------Round 2---------
+# This round Key
+# D8 F4 91 A7
+# FF AB A9 E2
+# 3A E5 7F B1
+# BC 4B EE 12
+# After Susbstitution
+# 4D 21 FB E2
+# B4 F1 63 C8
+# 24 C4 CF F0
+# 03 55 9B 22
+# After shift rows
+# 4D 21 FB E2
+# F1 63 C8 B4
+# CF F0 24 C4
+# 22 03 55 9B
+# After Mix column
+# 7F 14 DF 47
+# DC EF 49 5D
+# 5F BC 84 73
+# AD F6 50 60
+# After add round key
+# A7 E0 4E E0
+# 23 44 E0 BF
+# 65 59 FB C2
+# 11 BD BE 72
+# --------Round 3---------
+# This round Key
+# 44 B0 21 86
+# 37 9C 35 D7
+# F3 16 69 D8
+# E0 AB 45 57
+# After Susbstitution
+# 5C E1 2F E1
+# 26 1B E1 08
+# 4D CB 0F 25
+# 82 7A AE 40
+# After shift rows
+# 5C E1 2F E1
+# 1B E1 08 26
+# 0F 25 4D CB
+# 40 82 7A AE
+# After Mix column
+# DA 46 71 D6
+# 3B D5 92 45
+# 99 D7 33 A3
+# 70 E3 C0 92
+# After add round key
+# 9E F6 50 50
+# 0C 49 A7 92
+# 6A C1 5A 7B
+# 90 48 85 C5
+# --------Round 4---------
+# This round Key
+# 42 F2 D3 55
+# 56 CA FF 28
+# A8 BE D7 0F
+# A4 0F 4A 1D
+# After Susbstitution
+# 0B 42 53 53
+# FE 3B 5C 4F
+# 02 78 BE 21
+# 60 52 97 A6
+# After shift rows
+# 0B 42 53 53
+# 3B 5C 4F FE
+# BE 21 02 78
+# A6 60 52 97
+# After Mix column
+# 43 21 27 50
+# 02 F9 99 AB
+# A6 FC EE FF
+# CF 7B 1C 46
+# After add round key
+# 01 D3 F4 05
+# 54 33 66 83
+# 0E 42 39 F0
+# 6B 74 56 5B
+# --------Round 5---------
+# This round Key
+# 66 94 47 12
+# 20 EA 15 3D
+# 0C B2 65 6A
+# 58 57 1D 00
+# After Susbstitution
+# 7C 66 BF 6B
+# 20 C3 33 EC
+# AB 2C 12 8C
+# 7F 92 B1 39
+# After shift rows
+# 7C 66 BF 6B
+# C3 33 EC 20
+# 12 8C AB 2C
+# 39 7F 92 B1
+# After Mix column
+# 8D 6A 73 2B
+# EE F0 08 EE
+# D0 D7 B3 DB
+# 27 EB A2 C8
+# After add round key
+# EB FE 34 39
+# CE 1A 1D D3
+# DC 65 D6 B1
+# 7F BC BF C8
+# --------Round 6---------
+# This round Key
+# 61 F5 B2 A0
+# 22 C8 DD E0
+# 6F DD B8 D2
+# 91 C6 DB DB
+# After Susbstitution
+# E9 BB 18 12
+# 8B A2 A4 66
+# 86 4D F6 C8
+# D2 65 08 E8
+# After shift rows
+# E9 BB 18 12
+# A2 A4 66 8B
+# F6 C8 86 4D
+# E8 D2 65 08
+# After Mix column
+# 2A 80 79 E7
+# 5F 79 20 C0
+# 9F F9 C6 1B
+# BF 05 02 E0
+# After add round key
+# 4B 75 CB 47
+# 7D B1 FD 20
+# F0 24 7E C9
+# 2E C3 D9 3B
+# --------Round 7---------
+# This round Key
+# C0 35 87 27
+# 97 5F 82 62
+# D6 0B B3 61
+# 71 B7 6C B7
+# After Susbstitution
+# B3 9D 1F A0
+# FF C8 54 B7
+# 8C 36 F3 DD
+# 31 2E 35 E2
+# After shift rows
+# B3 9D 1F A0
+# C8 54 B7 FF
+# F3 DD 8C 36
+# E2 31 2E 35  
+# After Mix column
+# 2F 31 5E 42
+# D4 78 CB 2A
+# BB 3B D9 6C
+# 2A 57 46 58
+# After add round key
+# EF 04 D9 65
+# 43 27 49 48
+# 6D 30 6A 0D
+# 5B E0 2A EF
+# --------Round 8---------
+# This round Key
+# EA DF 58 7F
+# 78 27 A5 C7
+# 7F 74 C7 A6
+# BD 0A 66 D1
+# After Susbstitution
+# DF F2 35 4D
+# 1A CC 3B 52
+# 3C 04 02 D7
+# 39 E1 E5 DF
+# After shift rows
+# DF F2 35 4D
+# CC 3B 52 1A
+# 02 D7 3C 04
+# DF 39 E1 E5
+# After Mix column
+# 37 5C 41 55
+# 85 DF 34 90
+# 6D 37 27 6B
+# 11 93 E8 18
+# After add round key
+# DD 83 19 2A
+# FD F8 91 57
+# 12 43 E0 CD
+# AC 99 8E C9
+# --------Round 9---------
+# This round Key
+# 37 E8 B0 CF
+# 5C 7B DE 19
+# 41 35 F2 54
+# 6F 65 03 D2
+# After Susbstitution
+# C1 EC D4 E5
+# 54 41 81 5B
+# C9 1A E1 BD
+# 91 EE 19 DD
+# After shift rows
+# C1 EC D4 E5
+# 41 81 5B 54
+# E1 BD C9 1A
+# DD 91 EE 19
+# After Mix column
+# 66 77 79 2E
+# A6 B8 CC 7A
+# 25 A4 2F AE
+# 59 2A 32 48
+# After add round key
+# 51 9F C9 E1
+# FA C3 12 63
+# 64 91 DD FA
+# 36 4F 31 9A
+# --------Round 10---------
+# This round Key
+# D5 3D 8D 42
+# 7C 07 D9 C0
+# F4 C1 33 67
+# E5 80 83 51
+# After Susbstitution
+# D1 DB DD F8
+# 2D 2E C9 FB
+# 43 81 C1 2D
+# 05 84 C7 B8
+# After shift rows
+# D1 DB DD F8
+# 2E C9 FB 2D
+# C1 2D 43 81
+# B8 05 84 C7
+# After add round key
+# 04 E6 50 BA
+# 52 CE 22 ED
+# 35 EC 70 E6
+# 5D 85 07 96
+# -----------Result----------
+# Original Message
+# 4E 45 47 52 4F 53 20 4F 52 49 45 4E 54 41 4C 20
+# The cipher text is
+# 04 52 35 5D E6 CE EC 85 50 22 70 07 BA ED E6 96
+        
+        
+
+
+        

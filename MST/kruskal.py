@@ -1,4 +1,4 @@
-
+import graphviz
 import os
 
 class KruskalMST:
@@ -114,7 +114,7 @@ def get_user_input():
 
     return mst
 
-if __name__ == "__main__":
+def run_kruskal():
     mst = get_user_input()
 
     print("Choose node representation:")
@@ -127,4 +127,6 @@ if __name__ == "__main__":
     mst.visualize_full_graph()
     mst.visualize_mst()
 
+if __name__ == "__main__":
+    run_kruskal()
     

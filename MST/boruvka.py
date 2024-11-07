@@ -1,4 +1,4 @@
-
+import graphviz
 import os
 
 class BoruvkasMST:
@@ -117,10 +117,11 @@ def get_user_input():
 
     return mst
 
-if __name__ == "__main__":
+def run_boruvka():
     mst = get_user_input()
     mst.boruvka_mst()
     mst.visualize_full_graph()
     mst.visualize_mst()
 
-    
+    if __name__ == "__main__":
+        run_boruvka()

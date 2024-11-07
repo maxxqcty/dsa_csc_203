@@ -1,4 +1,4 @@
-
+import graphviz
 import os
 import time
 import heapq
@@ -106,10 +106,11 @@ def get_user_input():
 
     return mst
 
-if __name__ == "__main__":
+def run_prim():
     mst = get_user_input()
     mst.prim_mst()
     mst.visualize_full_graph()
     mst.visualize_mst()
 
-    
+if __name__ == "__main__":
+    run_prim()
